@@ -12,7 +12,7 @@ public class ProdutoDAO {
         // O PostgreSQL usará o SERIAL para gerar o ID automaticamente
         String sql = "INSERT INTO PRODUTO (ID_Categoria, Nome, Descricao, Peso_KG) VALUES (?, ?, ?, ?)";
         try (Connection conn = Conexao.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, produto.getIdCategoria());
             ps.setString(2, produto.getNome());
             ps.setString(3, produto.getDescricao());
@@ -30,7 +30,7 @@ public class ProdutoDAO {
     public void atualizar(Produto produto) throws Exception {
         String sql = "UPDATE PRODUTO SET ID_Categoria = ?, Nome = ?, Descricao = ?, Peso_KG = ? WHERE ID_Produto = ?";
         try (Connection conn = Conexao.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+            PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, produto.getIdCategoria());
             ps.setString(2, produto.getNome());
             ps.setString(3, produto.getDescricao());
@@ -43,7 +43,7 @@ public class ProdutoDAO {
     public void excluir(int id) throws Exception {
         String sql = "DELETE FROM PRODUTO WHERE ID_Produto = ?";
         try (Connection conn = Conexao.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+            PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             ps.executeUpdate();
         }
@@ -52,7 +52,7 @@ public class ProdutoDAO {
     public Produto buscarPorId(int id) throws Exception {
         String sql = "SELECT * FROM PRODUTO WHERE ID_Produto = ?";
         try (Connection conn = Conexao.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+            PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -73,8 +73,8 @@ public class ProdutoDAO {
         String sql = "SELECT ID_Produto, ID_Categoria, Nome, Descricao, Peso_KG FROM PRODUTO ORDER BY Nome";
         List<Produto> lista = new ArrayList<>();
         try (Connection conn = Conexao.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 lista.add(new Produto(
                         rs.getInt("ID_Produto"),

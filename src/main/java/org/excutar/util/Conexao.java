@@ -7,7 +7,7 @@ import java.sql.SQLException;
 public class Conexao {
 
     private static final String DRIVER = "org.postgresql.Driver";
-    private static final String URL = "jdbc:postgresql://localhost:5432/hotifruti";
+    private static final String URL = "jdbc:postgresql://localhost:5432/HortifrutiPOO";
     private static final String USER = "postgres";
     private static final String PASS = "12345678";
 
@@ -20,4 +20,19 @@ public class Conexao {
             throw new SQLException("Driver PostgreSQL não encontrado!", e);
         }
     }
+
+    /*public static void main(String[] args) {
+        try (Connection conn = getConnection()) {
+            if (conn != null) {
+                System.out.println("------------------------------------------");
+                System.out.println("✅ CONEXÃO REALIZADA COM SUCESSO!");
+                System.out.println("Projeto: Hortifruti");
+                System.out.println("Banco: PostgreSQL");
+                System.out.println("------------------------------------------");
+            }
+        } catch (SQLException e) {
+            System.err.println("❌ FALHA NA CONEXÃO:");
+            e.printStackTrace();
+        }
+    }*/
 }
