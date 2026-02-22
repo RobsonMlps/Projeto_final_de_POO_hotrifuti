@@ -37,5 +37,9 @@ public class Cliente {
         this.nome = nome;
     }
 
-    
+    // ADICIONADO: Faz o CPF e Nome aparecerem no ComboBox
+    @Override
+    public String toString() {
+        return this.cpf + " - " + this.nome;
+    }
 }

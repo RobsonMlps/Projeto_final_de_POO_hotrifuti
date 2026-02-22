@@ -70,19 +70,22 @@ public class ProdutoDAO {
     }
 
     public List<Produto> listar() throws Exception {
-        String sql = "SELECT ID_Produto, ID_Categoria, Nome, Descricao, Peso_KG FROM PRODUTO ORDER BY Nome";
+        String sql = "SELECT p.*, c.Nome AS catNome FROM PRODUTO p " +
+                "INNER JOIN CATEGORIA c ON p.ID_Categoria = c.ID_Categoria ORDER BY p.Nome";
         List<Produto> lista = new ArrayList<>();
         try (Connection conn = Conexao.getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql);
-            ResultSet rs = ps.executeQuery()) {
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
-                lista.add(new Produto(
+                Produto p = new Produto(
                         rs.getInt("ID_Produto"),
                         rs.getInt("ID_Categoria"),
                         rs.getString("Nome"),
                         rs.getString("Descricao"),
                         rs.getBigDecimal("Peso_KG")
-                ));
+                );
+                p.setNomeCategoria(rs.getString("catNome")); // Preenche o nome vindo do JOIN
+                lista.add(p);
             }
         }
         return lista;

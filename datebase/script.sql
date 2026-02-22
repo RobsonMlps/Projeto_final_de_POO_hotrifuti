@@ -34,11 +34,11 @@ INSERT INTO CATEGORIA (Nome, Descricao) VALUES
 ('Frutas', 'Frutas frescas nacionais e importadas'),
 ('Verduras', 'Folhas, alfaces e ervas frescas'),
 ('Legumes', 'Raízes, tubérculos e frutos não doces'),
-('Grãos', 'Feijão, arroz, milho e cereais a granel'),
+('Graos', 'Feijão, arroz, milho e cereais a granel'),
 ('Temperos', 'Condimentos secos e especiarias para cozinha');
 
 INSERT INTO CLIENTE (CPF, Nome) VALUES 
-('123.456.789-01', 'João Silva'),
+('123.456.789-01', 'Joao Silva'),
 ('234.567.890-12', 'Maria Oliveira'),
 ('345.678.901-23', 'Carlos Eduardo Santos'),
 ('456.789.012-34', 'Ana Paula Souza'),

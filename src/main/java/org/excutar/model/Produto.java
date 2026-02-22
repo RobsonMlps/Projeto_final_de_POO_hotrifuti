@@ -8,6 +8,8 @@ public class Produto {
     private String nome;
     private String descricao;
     private BigDecimal pesoKg;
+    private String nomeCategoria;
+
 
     // Construtor completo
     public Produto(int idProduto, int idCategoria, String nome, String descricao, BigDecimal pesoKg) {
@@ -36,4 +38,11 @@ public class Produto {
 
     public BigDecimal getPesoKg() { return pesoKg; }
     public void setPesoKg(BigDecimal pesoKg) { this.pesoKg = pesoKg; }
+
+    public String getNomeCategoria() {
+        return nomeCategoria; }
+
+    public void setNomeCategoria(String nomeCategoria) {
+
+        this.nomeCategoria = nomeCategoria; }
 }

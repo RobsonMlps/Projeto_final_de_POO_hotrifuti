@@ -35,5 +35,11 @@ public class Categoria {
     public void setDescricao(String descricao) {
         this.descricao = descricao;
     }
-    
+
+    // ADICIONADO: Faz o nome aparecer no ComboBox
+
+    public String toString() {
+
+        return this.nome + ":" + " " + this.descricao;
+    }
 }
