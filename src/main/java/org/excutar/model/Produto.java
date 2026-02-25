@@ -43,6 +43,11 @@ public class Produto {
         return nomeCategoria; }
 
     public void setNomeCategoria(String nomeCategoria) {
+        this.nomeCategoria = nomeCategoria;
+    }
 
-        this.nomeCategoria = nomeCategoria; }
+    @Override
+    public String toString() {
+        return this.nome; // Retorna só o nome pro ComboBox mostrar bonitinho
+    }
 }

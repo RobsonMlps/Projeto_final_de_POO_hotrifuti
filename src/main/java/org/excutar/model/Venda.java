@@ -9,7 +9,7 @@ public class Venda {
     private int quantidadeVendida;
     private BigDecimal precoUnidade;
     private Timestamp dataHora;
-    private Timestamp nomecliente;
+    
 
     public Venda (){}
 
