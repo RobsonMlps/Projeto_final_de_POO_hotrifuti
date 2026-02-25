@@ -17,7 +17,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="600.0" prefWidth="800.0" stylesheets="@../assets/style/tema.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.excutar.controller.Tela">
+<AnchorPane prefHeight="650.0" prefWidth="800.0" stylesheets="@../assets/style/tema.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.excutar.controller.Tela">
     <children>
         <TabPane tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <tabs>
@@ -28,10 +28,8 @@
                                 <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
                             </padding>
                             <children>
-                                <Label text="Cadastro de Produto">
-                                    <font>
-                                        <Font name="System Bold" size="24.0" />
-                                    </font>
+                                <Label text="Cadastro/Edição de Produto">
+                                    <font><Font name="System Bold" size="24.0" /></font>
                                 </Label>
                                 <GridPane hgap="10.0" vgap="10.0">
                                     <columnConstraints>
@@ -39,6 +37,7 @@
                                         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
                                     </columnConstraints>
                                     <rowConstraints>
+                                        <RowConstraints minHeight="10.0" prefHeight="35.0" vgrow="SOMETIMES" />
                                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
@@ -46,30 +45,38 @@
                                         <RowConstraints minHeight="10.0" prefHeight="40.0" vgrow="SOMETIMES" />
                                     </rowConstraints>
                                     <children>
-                                        <Label text="Nome:" GridPane.rowIndex="0">
+                                        <Label text="Editar ID:" textFill="#d35400">
                                             <font><Font name="System Bold" size="14.0" /></font>
                                         </Label>
                                         <TextField fx:id="txtProdNome" promptText="Ex: Maçã" GridPane.columnIndex="1" />
+                                        <ComboBox fx:id="cbEditarProdutoId" onAction="#preencherCamposProduto" prefWidth="400.0" promptText="Selecione um ID para Editar ou deixe vazio para Novo" GridPane.columnIndex="1" />
 
-                                        <Label text="Descrição:" GridPane.rowIndex="1">
+                                        <Label text="Nome:" GridPane.rowIndex="1">
                                             <font><Font name="System Bold" size="14.0" /></font>
                                         </Label>
                                         <TextField fx:id="txtProdDescricao" promptText="Ex: Fruta fresquinha" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                        <TextField fx:id="txtProdNome" promptText="Ex: produto" GridPane.columnIndex="1" GridPane.rowIndex="1" />
 
-                                        <Label text="Peso (KG):" GridPane.rowIndex="2">
+                                        <Label text="Descrição:" GridPane.rowIndex="2">
                                             <font><Font name="System Bold" size="14.0" /></font>
                                         </Label>
-                                        <TextField fx:id="txtProdPeso" promptText="Ex: 1.50" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                        <TextField fx:id="txtProdDescricao" promptText="Ex: descrição" GridPane.columnIndex="1" GridPane.rowIndex="2" />
 
-                                        <Label text="Categoria:" GridPane.rowIndex="3">
+                                        <Label text="Peso (KG):" GridPane.rowIndex="3">
                                             <font><Font name="System Bold" size="14.0" /></font>
                                         </Label>
-                                        <ComboBox fx:id="cbProdCategoria" prefWidth="400.0" promptText="Selecione a Categoria do Produto" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                        <TextField fx:id="txtProdPeso" promptText="Ex: 1.50" GridPane.columnIndex="1" GridPane.rowIndex="3" />
 
                                         <HBox spacing="15.0" GridPane.columnIndex="1" GridPane.rowIndex="4">
                                             <Button fx:id="btnSalvarProduto" onAction="#salvarProduto" prefHeight="30.0" prefWidth="150.0" styleClass="botao-salvar" text="Salvar Produto" />
                                             <Button onAction="#deletarProduto" prefHeight="30.0" prefWidth="150.0" style="-fx-background-color: #ff4c4c; -fx-font-weight: bold;" text="Deletar Produto" textFill="WHITE" />
                                         </HBox>
+                                        <Label text="Categoria:" GridPane.rowIndex="4">
+                                            <font><Font name="System Bold" size="14.0" /></font>
+                                        </Label>
+                                        <ComboBox fx:id="cbProdCategoria" prefWidth="400.0" promptText="Selecione a Categoria" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+
+                                        <Button fx:id="btnSalvarProduto" onAction="#salvarProduto" prefHeight="30.0" prefWidth="200.0" styleClass="botao-salvar" text="Salvar / Atualizar" GridPane.columnIndex="1" GridPane.rowIndex="5" />
                                     </children>
                                 </GridPane>
                                 <TableView fx:id="tblProdutos" VBox.vgrow="ALWAYS">
@@ -80,9 +87,7 @@
                                         <TableColumn fx:id="colProdPeso" prefWidth="100.0" text="Peso" />
                                         <TableColumn fx:id="colCateg" prefWidth="100.0" text="Categoria" />
                                     </columns>
-                                    <columnResizePolicy>
-                                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-                                    </columnResizePolicy>
+                                    <columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY" /></columnResizePolicy>
                                 </TableView>
                             </children>
                         </VBox>
@@ -96,10 +101,8 @@
                                 <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
                             </padding>
                             <children>
-                                <Label text="Cadastrar Venda">
-                                    <font>
-                                        <Font name="System Bold" size="24.0" />
-                                    </font>
+                                <Label text="Gerenciar Vendas">
+                                    <font><Font name="System Bold" size="24.0" /></font>
                                 </Label>
                                 <GridPane hgap="10.0" vgap="10.0">
                                     <columnConstraints>
@@ -107,25 +110,27 @@
                                         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
                                     </columnConstraints>
                                     <rowConstraints>
+                                        <RowConstraints minHeight="10.0" prefHeight="35.0" vgrow="SOMETIMES" />
                                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" /> <RowConstraints minHeight="10.0" prefHeight="40.0" vgrow="SOMETIMES" /> </rowConstraints>
                                     <children>
-                                        <Label text="Cliente:" GridPane.rowIndex="0">
+                                        <Label text="Editar ID:" textFill="#d35400">
                                             <font><Font name="System Bold" size="14.0" /></font>
                                         </Label>
-                                        <ComboBox fx:id="cbVendaCliente" prefWidth="400.0" promptText="Selecione o Nome do Cliente" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                                        <ComboBox fx:id="cbEditarVendaId" onAction="#preencherCamposVenda" prefWidth="400.0" promptText="Selecione um ID ou deixe vazio para Novo" GridPane.columnIndex="1" />
 
-                                        <Label text="Produto:" GridPane.rowIndex="1">
+                                        <Label text="Cliente:" GridPane.rowIndex="1">
                                             <font><Font name="System Bold" size="14.0" /></font>
                                         </Label>
                                         <ComboBox fx:id="cbVendaProduto" prefWidth="400.0" promptText="Selecione o Produto para Vender" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                        <ComboBox fx:id="cbVendaCliente" prefWidth="400.0" promptText="Selecione o Nome do Cliente" GridPane.columnIndex="1" GridPane.rowIndex="1" />
 
-                                        <Label text="Quantidade:" GridPane.rowIndex="2">
+                                        <Label text="ID Produto:" GridPane.rowIndex="2">
                                             <font><Font name="System Bold" size="14.0" /></font>
                                         </Label>
-                                        <TextField fx:id="txtVendaQuantidade" promptText="Ex: 5" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                        <TextField fx:id="txtproduto" promptText="Ex: 10" GridPane.columnIndex="1" GridPane.rowIndex="2" />
 
                                         <Label text="Preço Unid (R$):" GridPane.rowIndex="3">
                                             <font><Font name="System Bold" size="14.0" /></font>
@@ -150,11 +155,27 @@
                                     <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                                 </columnResizePolicy>
                             </TableView>
+                                        <Label text="Quantidade:" GridPane.rowIndex="3">
+                                            <font><Font name="System Bold" size="14.0" /></font>
+                                        </Label>
+                                        <TextField fx:id="txtVendaQuantidade" promptText="Ex: 5" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+
+                                        <Button fx:id="btnFinalizarVenda" onAction="#finalizarVenda" prefHeight="30.0" prefWidth="200.0" styleClass="botao-venda" text="Salvar / Atualizar" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                                    </children>
+                                </GridPane>
+                                <TableView fx:id="tblVendas" VBox.vgrow="ALWAYS">
+                                    <columns>
+                                        <TableColumn fx:id="colVendaId" text="ID" />
+                                        <TableColumn fx:id="colCliente" text="Cliente" />
+                                        <TableColumn fx:id="colproduto" text="Produto" />
+                                        <TableColumn fx:id="colquantidade" text="Quantidade" />
+                                    </columns>
+                                    <columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY" /></columnResizePolicy>
+                                </TableView>
                             </children>
                         </VBox>
                     </content>
                 </Tab>
-
             </tabs>
         </TabPane>
     </children>

@@ -8,10 +8,13 @@ import org.excutar.dao.*;
 import org.excutar.model.*;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Tela {
 
     // --- FXML IDs - PRODUTO ---
+    @FXML private ComboBox<Integer> cbEditarProdutoId; // NOVO
     @FXML private TextField txtProdNome, txtProdDescricao, txtProdPeso;
     @FXML private ComboBox<Categoria> cbProdCategoria;
     @FXML private TableView<Produto> tblProdutos;
@@ -22,6 +25,7 @@ public class Tela {
     @FXML private TableColumn<Produto, Integer> colCateg;
 
     // --- FXML IDs - VENDA ---
+    @FXML private ComboBox<Integer> cbEditarVendaId; // NOVO
     @FXML private ComboBox<Cliente> cbVendaCliente;
     @FXML private ComboBox<Produto> cbVendaProduto; // Agora é ComboBox!
     @FXML private TextField txtVendaQuantidade;
@@ -33,7 +37,6 @@ public class Tela {
     @FXML private TableColumn<Venda, Integer> colquantidade;
     @FXML private TableColumn<Venda, BigDecimal> colVendaPreco;
 
-    // DAOs instanciados
     private CategoriaDAO categoriaDAO = new CategoriaDAO();
     private ClienteDAO clienteDAO = new ClienteDAO();
     private ProdutoDAO produtoDAO = new ProdutoDAO();
@@ -46,16 +49,15 @@ public class Tela {
     }
 
     private void configurarColunas() {
-        // Vinculando com os nomes exatos dos atributos lá nas suas classes Model
         colProdId.setCellValueFactory(new PropertyValueFactory<>("idProduto"));
         colProdNome.setCellValueFactory(new PropertyValueFactory<>("nome"));
         colDescricao.setCellValueFactory(new PropertyValueFactory<>("descricao"));
         colProdPeso.setCellValueFactory(new PropertyValueFactory<>("pesoKg"));
-        colCateg.setCellValueFactory(new PropertyValueFactory<>("idCategoria"));
+        colCateg.setCellValueFactory(new PropertyValueFactory<>("nomeCategoria"));
 
         colVendaId.setCellValueFactory(new PropertyValueFactory<>("idVenda"));
-        colCliente.setCellValueFactory(new PropertyValueFactory<>("idCliente"));
-        colproduto.setCellValueFactory(new PropertyValueFactory<>("idProduto"));
+        colCliente.setCellValueFactory(new PropertyValueFactory<>("nomeCliente"));
+        colproduto.setCellValueFactory(new PropertyValueFactory<>("nomeProduto"));
         colquantidade.setCellValueFactory(new PropertyValueFactory<>("quantidadeVendida"));
         colVendaPreco.setCellValueFactory(new PropertyValueFactory<>("precoUnidade"));
     }
@@ -64,25 +66,75 @@ public class Tela {
         try {
             cbProdCategoria.setItems(FXCollections.observableArrayList(categoriaDAO.listar()));
             cbVendaCliente.setItems(FXCollections.observableArrayList(clienteDAO.listar()));
-            
-            // Carrega os produtos tanto na Tabela quanto no novo ComboBox de vendas!
-            var listaProdutos = FXCollections.observableArrayList(produtoDAO.listar());
-            cbVendaProduto.setItems(listaProdutos);
-            tblProdutos.setItems(listaProdutos);
-            
-            tblVendas.setItems(FXCollections.observableArrayList(vendaDAO.listar()));
+
+            List<Produto> produtos = produtoDAO.listar();
+            List<Venda> vendas = vendaDAO.listar();
+
+            tblProdutos.setItems(FXCollections.observableArrayList(produtos));
+            tblVendas.setItems(FXCollections.observableArrayList(vendas));
+
+            // NOVO: Atualiza a lista de IDs para os ComboBoxes de edição
+            List<Integer> idsProd = new ArrayList<>();
+            for(Produto p : produtos) idsProd.add(p.getIdProduto());
+            cbEditarProdutoId.setItems(FXCollections.observableArrayList(idsProd));
+
+            List<Integer> idsVenda = new ArrayList<>();
+            for(Venda v : vendas) idsVenda.add(v.getIdVenda());
+            cbEditarVendaId.setItems(FXCollections.observableArrayList(idsVenda));
+
         } catch (Exception e) {
             mostrarErro("Eita, deu bronca ao carregar dados: " + e.getMessage());
         }
     }
 
-    // ================= MÉTODOS DE PRODUTO ================= //
-    
+    // --- FUNÇÕES DE PREENCHIMENTO ---
+
+    @FXML
+    public void preencherCamposProduto() {
+        Integer idSel = cbEditarProdutoId.getValue();
+        if (idSel != null) {
+            for (Produto p : tblProdutos.getItems()) {
+                if (p.getIdProduto() == idSel) {
+                    txtProdNome.setText(p.getNome());
+                    txtProdDescricao.setText(p.getDescricao());
+                    txtProdPeso.setText(p.getPesoKg().toString());
+                    for (Categoria c : cbProdCategoria.getItems()) {
+                        if (c.getIdCategoria() == p.getIdCategoria()) {
+                            cbProdCategoria.setValue(c);
+                            break;
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+    }
+
+    @FXML
+    public void preencherCamposVenda() {
+        Integer idSel = cbEditarVendaId.getValue();
+        if (idSel != null) {
+            for (Venda v : tblVendas.getItems()) {
+                if (v.getIdVenda() == idSel) {
+                    txtproduto.setText(String.valueOf(v.getIdProduto()));
+                    txtVendaQuantidade.setText(String.valueOf(v.getQuantidadeVendida()));
+                    for (Cliente c : cbVendaCliente.getItems()) {
+                        if (c.getIdCliente() == v.getIdCliente()) {
+                            cbVendaCliente.setValue(c);
+                            break;
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+    }
+
     @FXML
     public void salvarProduto() {
         try {
             if (cbProdCategoria.getValue() == null) {
-                mostrarErro("Oxe, selecione uma categoria antes de salvar!");
+                mostrarErro("Selecione uma categoria!");
                 return;
             }
 
@@ -92,14 +144,20 @@ public class Tela {
             p.setPesoKg(new BigDecimal(txtProdPeso.getText().replace(",", ".")));
             p.setIdCategoria(cbProdCategoria.getValue().getIdCategoria());
 
-            produtoDAO.salvar(p);
+            Integer idEdit = cbEditarProdutoId.getValue();
+            if (idEdit == null) {
+                produtoDAO.salvar(p);
+                mostrarSucesso("Produto salvo com sucesso!");
+            } else {
+                p.setIdProduto(idEdit);
+                produtoDAO.atualizar(p); // PRECISA TER O MÉTODO ATUALIZAR NO DAO
+                mostrarSucesso("Produto ID " + idEdit + " atualizado!");
+            }
 
-            mostrarSucesso("Produto salvo com sucesso no estoque!");
-            limparCamposProduto();
-            carregarDadosBanco(); // Recarrega tudo pra atualizar tabela e o combobox de venda
-
+            carregarDadosBanco();
+            limparCampos();
         } catch (Exception e) {
-            mostrarErro("Erro ao salvar produto: " + e.getMessage());
+            mostrarErro("Erro: " + e.getMessage());
         }
     }
 
@@ -165,7 +223,7 @@ public class Tela {
         } catch (NumberFormatException e) {
             mostrarErro("Ei, digita só número na quantidade e no preço!");
         } catch (Exception e) {
-            mostrarErro("Erro ao realizar venda: " + e.getMessage());
+            mostrarErro("Erro: " + e.getMessage());
         }
     }
 
@@ -193,7 +251,12 @@ public class Tela {
         txtProdNome.clear();
         txtProdDescricao.clear();
         txtProdPeso.clear();
-        cbProdCategoria.getSelectionModel().clearSelection();
+        cbProdCategoria.setValue(null);
+        cbEditarProdutoId.setValue(null);
+        txtproduto.clear();
+        txtVendaQuantidade.clear();
+        cbVendaCliente.setValue(null);
+        cbEditarVendaId.setValue(null);
     }
 
     private void limparCamposVenda() {
@@ -213,6 +276,12 @@ public class Tela {
     private void mostrarSucesso(String msg) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setHeaderText("Tudo certo!");
+        alert.setContentText(msg);
+        alert.show();
+    }
+
+    private void mostrarSucesso(String msg) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setContentText(msg);
         alert.show();
     }
