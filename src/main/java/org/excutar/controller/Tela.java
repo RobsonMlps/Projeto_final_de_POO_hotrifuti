@@ -8,10 +8,13 @@ import org.excutar.dao.*;
 import org.excutar.model.*;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Tela {
 
     // --- FXML IDs - PRODUTO ---
+    @FXML private ComboBox<Integer> cbEditarProdutoId; // NOVO
     @FXML private TextField txtProdNome, txtProdDescricao, txtProdPeso;
     @FXML private ComboBox<Categoria> cbProdCategoria;
     @FXML private TableView<Produto> tblProdutos;
@@ -19,21 +22,19 @@ public class Tela {
     @FXML private TableColumn<Produto, String> colProdNome;
     @FXML private TableColumn<Produto, String> colDescricao;
     @FXML private TableColumn<Produto, BigDecimal> colProdPeso;
-    // MODIFICAÇÃO: Declarada a coluna que faltava para a Categoria
-    @FXML private TableColumn<Produto, Integer> colCateg;
+    @FXML private TableColumn<Produto, String> colCateg;
 
     // --- FXML IDs - VENDA ---
+    @FXML private ComboBox<Integer> cbEditarVendaId; // NOVO
     @FXML private ComboBox<Cliente> cbVendaCliente;
     @FXML private TextField txtproduto;
     @FXML private TextField txtVendaQuantidade;
     @FXML private TableView<Venda> tblVendas;
     @FXML private TableColumn<Venda, Integer> colVendaId;
-    // MODIFICAÇÃO: Declaradas as colunas que faltavam para a Tabela de Vendas
-    @FXML private TableColumn<Venda, Integer> colCliente;
-    @FXML private TableColumn<Venda, Integer> colproduto;
+    @FXML private TableColumn<Venda, String> colCliente;
+    @FXML private TableColumn<Venda, String> colproduto;
     @FXML private TableColumn<Venda, Integer> colquantidade;
 
-    // DAOs instanciados
     private CategoriaDAO categoriaDAO = new CategoriaDAO();
     private ClienteDAO clienteDAO = new ClienteDAO();
     private ProdutoDAO produtoDAO = new ProdutoDAO();
@@ -46,19 +47,15 @@ public class Tela {
     }
 
     private void configurarColunas() {
-        // Configuração Produto
         colProdId.setCellValueFactory(new PropertyValueFactory<>("idProduto"));
         colProdNome.setCellValueFactory(new PropertyValueFactory<>("nome"));
         colDescricao.setCellValueFactory(new PropertyValueFactory<>("descricao"));
         colProdPeso.setCellValueFactory(new PropertyValueFactory<>("pesoKg"));
-        // MODIFICAÇÃO: Vincula ao idCategoria do seu Model Produto
         colCateg.setCellValueFactory(new PropertyValueFactory<>("nomeCategoria"));
 
-        // Configuração Venda
         colVendaId.setCellValueFactory(new PropertyValueFactory<>("idVenda"));
-        // MODIFICAÇÃO: Vincula aos atributos do seu Model Venda
-        colCliente.setCellValueFactory(new PropertyValueFactory<>("idCliente"));
-        colproduto.setCellValueFactory(new PropertyValueFactory<>("idProduto"));
+        colCliente.setCellValueFactory(new PropertyValueFactory<>("nomeCliente"));
+        colproduto.setCellValueFactory(new PropertyValueFactory<>("nomeProduto"));
         colquantidade.setCellValueFactory(new PropertyValueFactory<>("quantidadeVendida"));
     }
 
@@ -67,20 +64,74 @@ public class Tela {
             cbProdCategoria.setItems(FXCollections.observableArrayList(categoriaDAO.listar()));
             cbVendaCliente.setItems(FXCollections.observableArrayList(clienteDAO.listar()));
 
-            // MODIFICAÇÃO: Agora carrega ambas as tabelas ao iniciar
-            tblProdutos.setItems(FXCollections.observableArrayList(produtoDAO.listar()));
-            tblVendas.setItems(FXCollections.observableArrayList(vendaDAO.listar()));
+            List<Produto> produtos = produtoDAO.listar();
+            List<Venda> vendas = vendaDAO.listar();
+
+            tblProdutos.setItems(FXCollections.observableArrayList(produtos));
+            tblVendas.setItems(FXCollections.observableArrayList(vendas));
+
+            // NOVO: Atualiza a lista de IDs para os ComboBoxes de edição
+            List<Integer> idsProd = new ArrayList<>();
+            for(Produto p : produtos) idsProd.add(p.getIdProduto());
+            cbEditarProdutoId.setItems(FXCollections.observableArrayList(idsProd));
+
+            List<Integer> idsVenda = new ArrayList<>();
+            for(Venda v : vendas) idsVenda.add(v.getIdVenda());
+            cbEditarVendaId.setItems(FXCollections.observableArrayList(idsVenda));
+
         } catch (Exception e) {
             mostrarErro("Erro ao carregar dados: " + e.getMessage());
+        }
+    }
+
+    // --- FUNÇÕES DE PREENCHIMENTO ---
+
+    @FXML
+    public void preencherCamposProduto() {
+        Integer idSel = cbEditarProdutoId.getValue();
+        if (idSel != null) {
+            for (Produto p : tblProdutos.getItems()) {
+                if (p.getIdProduto() == idSel) {
+                    txtProdNome.setText(p.getNome());
+                    txtProdDescricao.setText(p.getDescricao());
+                    txtProdPeso.setText(p.getPesoKg().toString());
+                    for (Categoria c : cbProdCategoria.getItems()) {
+                        if (c.getIdCategoria() == p.getIdCategoria()) {
+                            cbProdCategoria.setValue(c);
+                            break;
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+    }
+
+    @FXML
+    public void preencherCamposVenda() {
+        Integer idSel = cbEditarVendaId.getValue();
+        if (idSel != null) {
+            for (Venda v : tblVendas.getItems()) {
+                if (v.getIdVenda() == idSel) {
+                    txtproduto.setText(String.valueOf(v.getIdProduto()));
+                    txtVendaQuantidade.setText(String.valueOf(v.getQuantidadeVendida()));
+                    for (Cliente c : cbVendaCliente.getItems()) {
+                        if (c.getIdCliente() == v.getIdCliente()) {
+                            cbVendaCliente.setValue(c);
+                            break;
+                        }
+                    }
+                    break;
+                }
+            }
         }
     }
 
     @FXML
     public void salvarProduto() {
         try {
-            // Validação para evitar erro null
             if (cbProdCategoria.getValue() == null) {
-                mostrarErro("Selecione uma categoria antes de salvar!");
+                mostrarErro("Selecione uma categoria!");
                 return;
             }
 
@@ -90,50 +141,52 @@ public class Tela {
             p.setPesoKg(new BigDecimal(txtProdPeso.getText().replace(",", ".")));
             p.setIdCategoria(cbProdCategoria.getValue().getIdCategoria());
 
-            produtoDAO.salvar(p);
+            Integer idEdit = cbEditarProdutoId.getValue();
+            if (idEdit == null) {
+                produtoDAO.salvar(p);
+                mostrarSucesso("Produto salvo com sucesso!");
+            } else {
+                p.setIdProduto(idEdit);
+                produtoDAO.atualizar(p); // PRECISA TER O MÉTODO ATUALIZAR NO DAO
+                mostrarSucesso("Produto ID " + idEdit + " atualizado!");
+            }
 
-            // Atualiza a tabela na tela
-            tblProdutos.setItems(FXCollections.observableArrayList(produtoDAO.listar()));
+            carregarDadosBanco();
             limparCampos();
-
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setHeaderText("Sucesso!");
-            alert.setContentText("Produto salvo com sucesso!");
-            alert.show();
-
         } catch (Exception e) {
-            mostrarErro("Erro ao salvar produto: " + (e.getMessage() != null ? e.getMessage() : "Campos inválidos"));
+            mostrarErro("Erro: " + e.getMessage());
         }
     }
 
     @FXML
     public void finalizarVenda() {
         try {
-            Cliente cli = cbVendaCliente.getValue();
-            if (cli == null) {
+            if (cbVendaCliente.getValue() == null) {
                 mostrarErro("Selecione um cliente!");
                 return;
             }
 
             Venda v = new Venda();
-            v.setIdCliente(cli.getIdCliente());
+            v.setIdCliente(cbVendaCliente.getValue().getIdCliente());
             v.setIdProduto(Integer.parseInt(txtproduto.getText()));
             v.setQuantidadeVendida(Integer.parseInt(txtVendaQuantidade.getText()));
-
-            // Valores padrão para evitar erro no banco (NOT NULL)
-            v.setPrecoUnidade(new BigDecimal("0.00"));
+            v.setPrecoUnidade(BigDecimal.ZERO);
             v.setDataHora(new java.sql.Timestamp(System.currentTimeMillis()));
 
-            vendaDAO.salvar(v);
+            Integer idEdit = cbEditarVendaId.getValue();
+            if (idEdit == null) {
+                vendaDAO.salvar(v);
+                mostrarSucesso("Venda cadastrada!");
+            } else {
+                v.setIdVenda(idEdit);
+                vendaDAO.atualizar(v); // PRECISA TER O MÉTODO ATUALIZAR NO DAO
+                mostrarSucesso("Venda ID " + idEdit + " atualizada!");
+            }
 
-            // Atualiza a tabela de vendas
-            tblVendas.setItems(FXCollections.observableArrayList(vendaDAO.listar()));
-
-            txtproduto.clear();
-            txtVendaQuantidade.clear();
-
+            carregarDadosBanco();
+            limparCampos();
         } catch (Exception e) {
-            mostrarErro("Erro ao realizar venda: " + e.getMessage());
+            mostrarErro("Erro: " + e.getMessage());
         }
     }
 
@@ -141,11 +194,22 @@ public class Tela {
         txtProdNome.clear();
         txtProdDescricao.clear();
         txtProdPeso.clear();
-        cbProdCategoria.getSelectionModel().clearSelection();
+        cbProdCategoria.setValue(null);
+        cbEditarProdutoId.setValue(null);
+        txtproduto.clear();
+        txtVendaQuantidade.clear();
+        cbVendaCliente.setValue(null);
+        cbEditarVendaId.setValue(null);
     }
 
     private void mostrarErro(String msg) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setContentText(msg);
+        alert.show();
+    }
+
+    private void mostrarSucesso(String msg) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setContentText(msg);
         alert.show();
     }
