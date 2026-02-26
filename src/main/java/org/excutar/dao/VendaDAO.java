@@ -74,23 +74,39 @@ public class VendaDAO {
         return null;
     }
 
-    public List<Venda> listar() throws Exception {
-        String sql = "SELECT * FROM VENDA";
-        List<Venda> lista = new ArrayList<>();
-        try (Connection conn = Conexao.getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql);
-            ResultSet rs = ps.executeQuery()) {
+    public List<Venda> listar() {
+        List<Venda> vendas = new ArrayList<>();
+        
+        // SQL corrigido usando os sublinhados do PostgreSQL (id_cliente e id_produto)
+        String sql = "SELECT v.*, c.nome AS nome_cliente, p.nome AS nome_produto " +
+                    "FROM Venda v " +
+                    "LEFT JOIN Cliente c ON v.id_cliente = c.id_cliente " +
+                    "LEFT JOIN Produto p ON v.id_produto = p.id_produto";
+
+        try (Connection conn = Conexao.getConnection(); // Confirme se o nome do seu método de conexão é esse mesmo
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            ResultSet rs = stmt.executeQuery()) {
+
             while (rs.next()) {
-                lista.add(new Venda(
-                        rs.getInt("ID_Venda"),
-                        rs.getInt("ID_Cliente"),
-                        rs.getInt("ID_Produto"),
-                        rs.getInt("Quantidade_Vendida"),
-                        rs.getBigDecimal("Preco_Unidade"),
-                        rs.getTimestamp("Data_Hora")
-                ));
+                Venda v = new Venda();
+                
+                // Os nomes aqui dentro das aspas TÊM que ser idênticos às colunas lá no pgAdmin
+                v.setIdVenda(rs.getInt("id_venda")); 
+                v.setIdCliente(rs.getInt("id_cliente"));
+                v.setIdProduto(rs.getInt("id_produto"));
+                v.setQuantidadeVendida(rs.getInt("quantidade_vendida")); 
+                v.setPrecoUnidade(rs.getBigDecimal("preco_unidade")); 
+                v.setDataHora(rs.getTimestamp("data_hora")); 
+                
+                // Pegando os nomes que o JOIN trouxe
+                v.setNomeCliente(rs.getString("nome_cliente"));
+                v.setNomeProduto(rs.getString("nome_produto"));
+
+                vendas.add(v);
             }
+        } catch (SQLException e) {
+            System.err.println("Erro ao listar vendas: " + e.getMessage());
         }
-        return lista;
+        return vendas;
     }
 }

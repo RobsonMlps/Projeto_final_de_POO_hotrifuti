@@ -9,6 +9,8 @@ public class Venda {
     private int quantidadeVendida;
     private BigDecimal precoUnidade;
     private Timestamp dataHora;
+    private String nomeCliente;
+    private String nomeProduto;
     
 
     public Venda (){}
@@ -71,5 +73,19 @@ public class Venda {
         this.dataHora = dataHora;
     }
 
+    public String getNomeCliente() {
+        return nomeCliente; 
+    }
 
+    public void setNomeCliente(String nomeCliente) { 
+        this.nomeCliente = nomeCliente; 
+    }
+
+    public String getNomeProduto() { 
+        return nomeProduto; 
+    }
+
+    public void setNomeProduto(String nomeProduto) { 
+        this.nomeProduto = nomeProduto; 
+    }
 }
